@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+agno
+openai
+agent-sandbox
+python-dotenv
+sqlalchemy
+sqlalchemy

@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  # agent-infra 沙箱
+  sandbox:
+    image: ghcr.io/agent-infra/sandbox:latest
+    # 国内用户替换为：
+    # image: enterprise-public-cn-beijing.cr.volces.com/vefaas-public/all-in-one-sandbox:latest
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # FastAPI 后端
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file: ./backend/.env
+    environment:
+      - SANDBOX_BASE_URL=http://sandbox:8080
+    volumes:
+      - ./backend/outputs:/app/outputs
+      - ./backend/uploads:/app/uploads
+      - ./backend/skills:/app/skills
+    depends_on:
+      - sandbox
+    restart: unless-stopped
+
+  # React 前端（生产构建）
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
